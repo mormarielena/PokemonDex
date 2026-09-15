@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,10 +24,11 @@ import com.example.pokemondex.features.infohub.ui.HubDetailScreen
 import com.example.pokemondex.features.infohub.ui.HubScreen
 import com.example.pokemondex.features.pokedex.ui.PokedexListScreen
 import com.example.pokemondex.features.pokedex.ui.PokemonDetailScreen
+import com.example.pokemondex.features.teammaker.ui.TeamMakerScreen
 import com.example.pokemondex.ui.theme.PokemonDexTheme
 
 enum class Screen {
-    Pokedex, InfoHub
+    Pokedex, InfoHub, TeamMaker
 }
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +55,12 @@ class MainActivity : ComponentActivity() {
                                     icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) }
                                 )
                                 NavigationBarItem(
+                                    selected = currentScreen == Screen.TeamMaker,
+                                    onClick = { currentScreen = Screen.TeamMaker },
+                                    label = { Text("Team") },
+                                    icon = { Icon(Icons.Default.Star, contentDescription = null) }
+                                )
+                                NavigationBarItem(
                                     selected = currentScreen == Screen.InfoHub,
                                     onClick = { currentScreen = Screen.InfoHub },
                                     label = { Text("Hub") },
@@ -74,6 +82,9 @@ class MainActivity : ComponentActivity() {
                                     )
                                     BackHandler { selectedPokemon = null }
                                 }
+                            }
+                            Screen.TeamMaker -> {
+                                TeamMakerScreen()
                             }
                             Screen.InfoHub -> {
                                 if (selectedCategory == null) {

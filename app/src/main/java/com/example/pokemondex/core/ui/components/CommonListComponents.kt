@@ -1,16 +1,16 @@
 package com.example.pokemondex.core.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,9 +19,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
-/**
- * Reusabe card for basic info used both in Pokedex list and Hub list
- */
+//reusable accordion component
+@Composable
+fun Accordion(
+    title: String,
+    initialOpen: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    var isOpen by remember { mutableStateOf(initialOpen) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider(color = Color(0xFFF3F4F6))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isOpen = !isOpen }
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title, 
+                fontWeight = FontWeight.Black, 
+                fontSize = 14.sp, 
+                color = Color.DarkGray, 
+                letterSpacing = 1.sp
+            )
+            Icon(
+                imageVector = if (isOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = "Toggle",
+                tint = Color.Gray
+            )
+        }
+        AnimatedVisibility(visible = isOpen) {
+            Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+//reusable card component with types
 @Composable
 fun DexCard(
     title: String,

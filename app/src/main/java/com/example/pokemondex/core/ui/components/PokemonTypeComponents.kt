@@ -27,10 +27,24 @@ fun TypeBadge(type: String) {
 
 fun getTypeColor(type: String): Color {
     return when (type.uppercase()) {
-        "GRASS" -> Color(0xFF63BC5A)
-        "POISON" -> Color(0xFFB567CE)
         "FIRE" -> Color(0xFFFF9D55)
         "WATER" -> Color(0xFF5090D6)
+        "GRASS" -> Color(0xFF63BC5A)
+        "ELECTRIC" -> Color(0xFFF4D23C)
+        "FLYING" -> Color(0xFF89AAE3)
+        "DRAGON" -> Color(0xFF0C69C8)
+        "POISON" -> Color(0xFFB567CE)
+        "GHOST" -> Color(0xFF5269AC)
+        "DARK" -> Color(0xFF5A5366)
+        "FAIRY" -> Color(0xFFEC8FE6)
+        "PSYCHIC" -> Color(0xFFFA7179)
+        "ICE" -> Color(0xFF74CEC0)
+        "ROCK" -> Color(0xFFC7B78B)
+        "GROUND" -> Color(0xFFE2D291)
+        "STEEL" -> Color(0xFF5A8EA1)
+        "FIGHTING" -> Color(0xFFCE4069)
+        "BUG" -> Color(0xFF90C12C)
+        "NORMAL" -> Color(0xFF9099A1)
         else -> Color.Gray
     }
 }
