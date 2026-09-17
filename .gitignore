@@ -4,22 +4,14 @@
 build/
 
 # IntelliJ IDEA / Android Studio
-
-.idea/workspace.xml
-.idea/libraries/
-.idea/modules.xml
-.idea/navigation.xml
-.idea/assetWizardSettings.xml
-.idea/caches/
-.idea/shelf/
-.idea/runConfigurations.xml
-.idea/deploymentTargetSelector.xml
+.idea/
 *.iml
 *.ipr
 *.iws
 
 # Local configuration
 local.properties
+secrets.properties
 
 # Log files
 *.log

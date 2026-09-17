@@ -1,5 +1,6 @@
 package com.example.pokemondex.core.data.network
 
+import com.example.pokemondex.core.data.network.model.EvolutionChainDto
 import com.example.pokemondex.core.data.network.model.PokemonDetailDto
 import com.example.pokemondex.core.data.network.model.PokemonListResponse
 import com.example.pokemondex.core.data.network.model.PokemonSpeciesDto
@@ -8,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * api calls for pokemon
@@ -30,6 +32,11 @@ interface PokeApiService {
         @Path("id") id: Int
     ): PokemonSpeciesDto
 
+    @GET
+    suspend fun getEvolutionChain(
+        @Url url: String
+    ): EvolutionChainDto
+
     // endpoints infohub
     
     @GET("berry")
@@ -47,9 +54,7 @@ interface PokeApiService {
         @Query("limit") limit: Int = 20
     ): PokemonListResponse
 
-    /**
-     * retrofit companion object
-     */
+    //retrofit companion object
     companion object {
         private const val BASE_URL = "https://pokeapi.co/api/v2/"
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,10 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.pokemondex.core.ui.components.Accordion
 import com.example.pokemondex.features.infohub.viewmodel.HubViewModel
 
 data class Category(
@@ -91,6 +95,41 @@ fun HubScreen(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Saved Teams Accordion
+            Accordion(title = "SAVED TEAMS", initialOpen = false) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MockTeamItem(name = "Dream Team #1", count = 6)
+                    MockTeamItem(name = "Kanto Starters", count = 3)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MockTeamItem(name: String, count: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF9FAFB), RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(Color(0xFFFFE4E6), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Default.Star, contentDescription = null, tint = Color.Red, modifier = Modifier.size(20.dp))
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(text = name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(text = "$count Pokémon", fontSize = 12.sp, color = Color.Gray)
         }
     }
 }
@@ -141,6 +180,7 @@ fun SectionContainer(title: String, content: @Composable () -> Unit) {
     }
 }
 
+//to-do when initialize room database
 @Composable
 fun FavoriteMiniCard(id: Int, name: String) {
     Column(

@@ -1,12 +1,14 @@
 package com.example.pokemondex.features.pokedex.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,15 +31,15 @@ fun PokedexListScreen(
     onPokemonClick: (Pokemon) -> Unit,
     viewModel: PokedexViewModel = viewModel()
 ) {
-    val pokemonList = viewModel.pokemonList
-    val isLoading = viewModel.isLoading
+    val pokemonList = viewModel.filteredPokemonList
+    val isLoadingInitial = viewModel.isLoadingInitial
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Titlu
+        // Title
         Text(
             text = "Pokédex",
             fontSize = 32.sp,
@@ -45,34 +47,55 @@ fun PokedexListScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
         
-        SearchBar()
+        SearchBar(
+            query = viewModel.searchQuery,
+            onQueryChange = { viewModel.updateSearchQuery(it) }
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
-        FilterChips()
+        
+        FilterChips(
+            selectedType = viewModel.selectedType,
+            onTypeClick = { viewModel.updateSelectedType(it) }
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
-        
-        if (isLoading && pokemonList.isEmpty()) {
+
+        //load more pokemons when reached bottom of initial list load
+        if (isLoadingInitial && pokemonList.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color.Red)
             }
         } else {
-            PokemonList(pokemonList, onPokemonClick)
+            PokemonList(
+                pokemonList = pokemonList, 
+                onPokemonClick = onPokemonClick,
+                isFetchingMore = viewModel.isFetchingMore,
+                canLoadMore = viewModel.canLoadMore,
+                onLoadMore = { viewModel.fetchNextPage() }
+            )
         }
     }
 }
 
-// TO-DO search functionality
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar() {
-    var text by remember { mutableStateOf("") }
-    
+fun SearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit
+) {
     TextField(
-        value = text,
-        onValueChange = { text = it },
+        value = query,
+        onValueChange = onQueryChange,
         placeholder = { Text("Search by name or number...", color = Color.Gray) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon", tint = Color.Gray) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.Gray)
+                }
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -82,27 +105,44 @@ fun SearchBar() {
             unfocusedContainerColor = Color(0xFFF2F2F2),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
-        )
+        ),
+        singleLine = true
     )
 }
 
-// TO-DO clickable categories
 @Composable
-fun FilterChips() {
-    val filters = listOf("Gen 1", "Gen 2", "Gen 3", "Dark", "Dragon", "Electric", "Fairy")
+fun FilterChips(
+    selectedType: String?,
+    onTypeClick: (String) -> Unit
+) {
+    val types = listOf(
+        "Normal", "Fire", "Water", "Grass", "Electric", "Ice", 
+        "Fighting", "Poison", "Ground", "Flying", "Psychic", 
+        "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"
+    )
     
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(filters) { filter ->
+        items(types) { type ->
+            val isSelected = type.uppercase() == selectedType
+            val chipColor = if (isSelected) getTypeColor(type) else Color(0xFFF2F2F2)
+            val textColor = if (isSelected) Color.White else Color.DarkGray
+            
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF2F2F2))
+                    .background(chipColor)
+                    .clickable { onTypeClick(type.uppercase()) }
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(text = filter, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                Text(
+                    text = type, 
+                    fontSize = 14.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    color = textColor
+                )
             }
         }
     }
@@ -111,14 +151,37 @@ fun FilterChips() {
 @Composable
 fun PokemonList(
     pokemonList: List<Pokemon>,
-    onPokemonClick: (Pokemon) -> Unit
+    onPokemonClick: (Pokemon) -> Unit,
+    isFetchingMore: Boolean,
+    canLoadMore: Boolean,
+    onLoadMore: () -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(pokemonList) { pokemon ->
+            // Trigger load more when near the bottom
+            if (pokemon == pokemonList.last() && canLoadMore && !isFetchingMore) {
+                LaunchedEffect(Unit) {
+                    onLoadMore()
+                }
+            }
             PokemonCard(pokemon, onPokemonClick)
+        }
+
+        // Show spinner at the bottom if we are loading more
+        if (isFetchingMore) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.Red)
+                }
+            }
         }
     }
 }
@@ -130,7 +193,7 @@ fun PokemonCard(
 ) {
     DexCard(
         title = pokemon.name,
-        subtitle = "#${pokemon.id}",
+        subtitle = "#${pokemon.id.toString().padStart(3, '0')}",
         imageUrl = pokemon.imageUrl,
         accentColor = getTypeColor(pokemon.types.first()),
         onClick = { onPokemonClick(pokemon) }

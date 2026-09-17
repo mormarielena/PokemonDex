@@ -102,8 +102,39 @@ fun TeamMakerScreen(
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Team stats accordion
+        Accordion(title = "TEAM STATS", initialOpen = false) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                StatRow(label = "Total HP", value = viewModel.teamHp.toString(), color = Color(0xFF4CAF50))
+                StatRow(label = "Total Attack", value = viewModel.teamAttack.toString(), color = Color(0xFFF44336))
+                StatRow(label = "Total Defense", value = viewModel.teamDefense.toString(), color = Color(0xFF2196F3))
+            }
+        }
         
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+fun StatRow(label: String, value: String, color: Color) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .background(color, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.Black)
+        }
     }
 }
 
