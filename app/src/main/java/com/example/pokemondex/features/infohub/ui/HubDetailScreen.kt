@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pokemondex.R
 import com.example.pokemondex.core.ui.components.DexCard
 import com.example.pokemondex.features.infohub.viewmodel.HubViewModel
 
@@ -51,7 +53,10 @@ fun HubDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Înapoi")
+                    Icon(
+                        painter = painterResource(id = R.drawable.back_arrow),
+                        contentDescription = "Back"
+                    )
                 }
                 Text(
                     text = category.label,

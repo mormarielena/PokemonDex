@@ -17,7 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.example.pokemondex.R
 import com.example.pokemondex.core.data.model.Pokemon
 import com.example.pokemondex.core.ui.components.RadarChart
 import com.example.pokemondex.core.ui.components.StatBar
@@ -54,9 +56,10 @@ fun PokemonDetailScreen(pokemon: Pokemon, onBackClick: () -> Unit) {
                 ) {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.back_arrow),
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))

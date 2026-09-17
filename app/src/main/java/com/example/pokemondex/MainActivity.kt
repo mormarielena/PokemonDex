@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
@@ -18,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.example.pokemondex.core.data.model.Pokemon
 import com.example.pokemondex.features.infohub.ui.Category
 import com.example.pokemondex.features.infohub.ui.HubDetailScreen
@@ -52,19 +55,41 @@ class MainActivity : ComponentActivity() {
                                     selected = currentScreen == Screen.Pokedex,
                                     onClick = { currentScreen = Screen.Pokedex },
                                     label = { Text("Pokédex") },
-                                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) }
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.pokedex_icon),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+
+
+                                    }
                                 )
                                 NavigationBarItem(
                                     selected = currentScreen == Screen.TeamMaker,
                                     onClick = { currentScreen = Screen.TeamMaker },
                                     label = { Text("Team") },
-                                    icon = { Icon(Icons.Default.Star, contentDescription = null) }
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.pokemon_trainer),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
                                 )
                                 NavigationBarItem(
                                     selected = currentScreen == Screen.InfoHub,
                                     onClick = { currentScreen = Screen.InfoHub },
                                     label = { Text("Hub") },
-                                    icon = { Icon(Icons.Default.Info, contentDescription = null) }
+
+
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.infohub_icon),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
                                 )
                             }
                         }
