@@ -1,56 +1,55 @@
 package com.example.pokemondex.features.infohub.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pokemondex.core.data.network.PokeApiService
 import kotlinx.coroutines.launch
 
-//data model for dashboard
 data class HubStats(
-    val berryCount: String = "...",
-    val itemCount: String = "...",
-    val locationCount: String = "..."
+    val berryCount: String = "Loading...",
+    val itemCount: String = "Loading...",
+    val locationCount: String = "Loading..."
 )
 
-
 data class HubItem(
-    val name: String,
     val id: String,
+    val name: String,
     val imageUrl: String
 )
 
-class HubViewModel : ViewModel() {
+class HubViewModel(application: Application) : AndroidViewModel(application) {
 
     var stats by mutableStateOf(HubStats())
         private set
-
+        
     var currentList by mutableStateOf<List<HubItem>>(emptyList())
         private set
-
+        
     var isLoading by mutableStateOf(false)
         private set
 
     init {
-        loadStats()
+        fetchStats()
     }
 
-    private fun loadStats() {
+    private fun fetchStats() {
         viewModelScope.launch {
             try {
-                val berries = PokeApiService.instance.getBerryList(limit = 1)
-                val items = PokeApiService.instance.getItemList(limit = 1)
-                val locations = PokeApiService.instance.getLocationList(limit = 1)
-
+                val berries = PokeApiService.instance.getBerryList(limit = 1).count
+                val items = PokeApiService.instance.getItemList(limit = 1).count
+                val locations = PokeApiService.instance.getLocationList(limit = 1).count
+                
                 stats = HubStats(
-                    berryCount = "${berries.count} types",
-                    itemCount = "${items.count} items",
-                    locationCount = "${locations.count} places"
+                    berryCount = "$berries available",
+                    itemCount = "$items items",
+                    locationCount = "$locations mapped"
                 )
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } catch (_: Exception) {
+                stats = HubStats("Error", "Error", "Error")
             }
         }
     }
@@ -58,30 +57,28 @@ class HubViewModel : ViewModel() {
     fun loadCategory(key: String) {
         viewModelScope.launch {
             isLoading = true
-            currentList = emptyList()
             try {
-                val response = when (key) {
-                    "berries" -> PokeApiService.instance.getBerryList(limit = 30)
-                    "items" -> PokeApiService.instance.getItemList(limit = 30)
-                    else -> PokeApiService.instance.getLocationList(limit = 30)
+                val results = when(key) {
+                    "berries" -> PokeApiService.instance.getBerryList(limit = 20).results
+                    "items" -> PokeApiService.instance.getItemList(limit = 20).results
+                    "places" -> PokeApiService.instance.getLocationList(limit = 20).results
+                    else -> emptyList()
                 }
 
-                currentList = response.results.map { entry ->
-                    //  extract id from url
-                    val id = entry.url.split("/").dropLast(1).last()
-
-                    val imageUrl = if (key == "locations") {
-                        ""
-                    } else if (key == "berries") {
-                        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${entry.name}-berry.png"
-                    } else {
-                        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${entry.name}.png"
+                currentList = results.map { resource ->
+                    val urlParts = resource.url.split("/").filter { it.isNotEmpty() }
+                    val id = urlParts.last()
+                    
+                    val imgUrl = when(key) {
+                        "berries" -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/berry-${resource.name}.png"
+                        "items" -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${resource.name}.png"
+                        else -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png"
                     }
-
+                    
                     HubItem(
-                        name = entry.name.replace("-", " ").replaceFirstChar { it.uppercase() },
-                        id = "#$id",
-                        imageUrl = imageUrl
+                        id = "#${id.padStart(3, '0')}",
+                        name = resource.name.replace("-", " ").replaceFirstChar { it.uppercase() },
+                        imageUrl = imgUrl
                     )
                 }
             } catch (e: Exception) {

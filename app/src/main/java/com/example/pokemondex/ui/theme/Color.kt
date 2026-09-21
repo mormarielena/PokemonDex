@@ -3,7 +3,7 @@ package com.example.pokemondex.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val PaleTeal = Color(0xFF84DCB2)
-val PaleYellow = Color(0xFFF6E8A6)
+val PaleYellow = Color(0xFFFAF2E8)
 val WarmBeige = Color(0xFFF9C88D)
 val SoftCherry = Color(0xFFDC795F)
 val WarmOrange = Color(0xFFFD8F52)

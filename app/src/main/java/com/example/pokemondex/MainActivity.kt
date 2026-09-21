@@ -5,10 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
@@ -50,7 +53,15 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         // show bottom bar only on pokedex screen
                         if (selectedPokemon == null && selectedCategory == null) {
-                            NavigationBar {
+                            NavigationBar(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                                    .border(
+                                        width = 1.5.dp,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                                    )
+                            ) {
                                 NavigationBarItem(
                                     selected = currentScreen == Screen.Pokedex,
                                     onClick = { currentScreen = Screen.Pokedex },

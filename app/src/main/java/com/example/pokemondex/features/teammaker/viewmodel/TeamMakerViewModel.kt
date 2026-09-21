@@ -1,14 +1,13 @@
 package com.example.pokemondex.features.teammaker.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import com.example.pokemondex.core.data.model.EvolutionMember
+import androidx.lifecycle.AndroidViewModel
 import com.example.pokemondex.core.data.model.Pokemon
 
-
-class TeamMakerViewModel : ViewModel() {
+class TeamMakerViewModel(application: Application) : AndroidViewModel(application) {
 
     // 6 slot list
     var team by mutableStateOf<List<Pokemon?>>(List(6) { null })
@@ -22,67 +21,38 @@ class TeamMakerViewModel : ViewModel() {
     val uniqueTypes: List<String>
         get() = team.filterNotNull().flatMap { it.types }.distinct()
 
-    // Mock team stats
+    // Team stats (Calculated as Averages / Means)
     val teamHp: Int
-        get() = team.count { it != null } * 80 + (if (filledCount > 0) 45 else 0)
+        get() {
+            val active = team.filterNotNull()
+            return if (active.isEmpty()) 0 else active.map { it.hp }.average().toInt()
+        }
     
     val teamAttack: Int
-        get() = team.count { it != null } * 95 + (if (filledCount > 0) 30 else 0)
+        get() {
+            val active = team.filterNotNull()
+            return if (active.isEmpty()) 0 else active.map { it.atk }.average().toInt()
+        }
     
     val teamDefense: Int
-        get() = team.count { it != null } * 75 + (if (filledCount > 0) 25 else 0)
+        get() {
+            val active = team.filterNotNull()
+            return if (active.isEmpty()) 0 else active.map { it.def }.average().toInt()
+        }
 
-    init {
-        // mocked data for teammaker
-        addMockInitialTeam()
-    }
-
-    private fun addMockInitialTeam() {
-        // mock initial team
-        val initial = team.toMutableList()
-        initial[0] = Pokemon(
-            id = 6, 
-            name = "Charizard", 
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
-            types = listOf("FIRE", "FLYING"),
-            weight = "90.5 kg",
-            height = "1.7 m",
-            description = "Spits fire that is hot enough to melt boulders. Known to cause forest fires unintentionally.",
-            category = "Flame Pokémon",
-            ability = "Blaze",
-            hp = 78, atk = 84, def = 78, spatk = 109, spdef = 85, spd = 100,
-            generation = 1,
-            color = "red",
-            gameAppearances = listOf("Red", "Blue", "Yellow"),
-            evolutionChain = listOf(
-                EvolutionMember(4, "Charmander", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png"),
-                EvolutionMember(5, "Charmeleon", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png"),
-                EvolutionMember(6, "Charizard", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png")
-            ),
-            moves = listOf("Flamethrower", "Fly", "Slash")
-        )
-        initial[1] = Pokemon(
-            id = 25, 
-            name = "Pikachu", 
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
-            types = listOf("ELECTRIC"),
-            weight = "6.0 kg",
-            height = "0.4 m",
-            description = "When several of these POKéMON gather, their electricity could build and cause lightning storms.",
-            category = "Mouse Pokémon",
-            ability = "Static",
-            hp = 35, atk = 55, def = 40, spatk = 50, spdef = 50, spd = 90,
-            generation = 1,
-            color = "yellow",
-            gameAppearances = listOf("Red", "Blue", "Yellow"),
-            evolutionChain = listOf(
-                EvolutionMember(25, "Pikachu", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"),
-                EvolutionMember(26, "Raichu", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png")
-            ),
-            moves = listOf("Thunderbolt", "Quick Attack", "Iron Tail")
-        )
-        team = initial
-    }
+    // Predefined popular pokemon to pick from
+    val availablePokemon = listOf(
+        createMockPokemon(25, "Pikachu", "ELECTRIC", "yellow", 35, 55, 40),
+        createMockPokemon(6, "Charizard", "FIRE", "red", 78, 84, 78, "FLYING"),
+        createMockPokemon(3, "Venusaur", "GRASS", "green", 80, 82, 83, "POISON"),
+        createMockPokemon(9, "Blastoise", "WATER", "blue", 79, 83, 100),
+        createMockPokemon(94, "Gengar", "GHOST", "purple", 60, 65, 60, "POISON"),
+        createMockPokemon(143, "Snorlax", "NORMAL", "gray", 160, 110, 65),
+        createMockPokemon(149, "Dragonite", "DRAGON", "brown", 91, 134, 95, "FLYING"),
+        createMockPokemon(150, "Mewtwo", "PSYCHIC", "purple", 106, 110, 90),
+        createMockPokemon(130, "Gyarados", "WATER", "blue", 95, 125, 79, "FLYING"),
+        createMockPokemon(448, "Lucario", "FIGHTING", "blue", 70, 110, 70, "STEEL")
+    )
 
     fun removePokemon(index: Int) {
         val newList = team.toMutableList()
@@ -90,30 +60,35 @@ class TeamMakerViewModel : ViewModel() {
         team = newList
     }
 
-    fun addPokemon(index: Int) {
-        // selection; mocked a pokemon
+    fun addPokemonToSlot(index: Int, pokemon: Pokemon) {
         val newList = team.toMutableList()
-        newList[index] = Pokemon(
-            id = 94, 
-            name = "Gengar", 
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
-            types = listOf("GHOST", "POISON"),
-            weight = "40.5 kg",
-            height = "1.5 m",
-            description = "Under a full moon, this POKéMON likes to mimic the shadows of people and laugh at their fright.",
-            category = "Shadow Pokémon",
-            ability = "Cursed Body",
-            hp = 60, atk = 65, def = 60, spatk = 130, spdef = 75, spd = 110,
-            generation = 1,
-            color = "purple",
-            gameAppearances = listOf("Red", "Blue", "Yellow"),
-            evolutionChain = listOf(
-                EvolutionMember(92, "Gastly", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/92.png"),
-                EvolutionMember(93, "Haunter", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png"),
-                EvolutionMember(94, "Gengar", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png")
-            ),
-            moves = listOf("Shadow Ball", "Hypnosis", "Dream Eater")
-        )
+        newList[index] = pokemon
         team = newList
+    }
+
+    private fun createMockPokemon(
+        id: Int, name: String, type1: String, color: String, 
+        hp: Int, atk: Int, def: Int, type2: String? = null
+    ): Pokemon {
+        val types = mutableListOf(type1)
+        if (type2 != null) types.add(type2)
+        
+        return Pokemon(
+            id = id,
+            name = name,
+            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png",
+            types = types,
+            weight = "Unknown",
+            height = "Unknown",
+            description = "A powerful $name.",
+            category = "Unknown",
+            ability = "Unknown",
+            hp = hp, atk = atk, def = def, spatk = 50, spdef = 50, spd = 50,
+            generation = 1,
+            color = color,
+            gameAppearances = listOf(),
+            evolutionChain = listOf(),
+            moves = listOf()
+        )
     }
 }

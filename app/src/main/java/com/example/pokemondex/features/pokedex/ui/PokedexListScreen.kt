@@ -1,6 +1,7 @@
 package com.example.pokemondex.features.pokedex.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.pokemondex.R
 import com.example.pokemondex.core.data.model.Pokemon
 import com.example.pokemondex.core.ui.components.DexCard
 import com.example.pokemondex.core.ui.components.TypeBadge
@@ -39,12 +43,13 @@ fun PokedexListScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Title
-        Text(
-            text = "Pokédex",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        // Title Image
+        Image(
+            painter = painterResource(id = R.drawable.pokedex_title),
+            contentDescription = "Pokédex",
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .height(48.dp)
         )
         
         SearchBar(
@@ -99,6 +104,7 @@ fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
+            .border(1.5.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp)),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color(0xFFF2F2F2),
@@ -132,6 +138,7 @@ fun FilterChips(
             
             Box(
                 modifier = Modifier
+                    .border(1.5.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(chipColor)
                     .clickable { onTypeClick(type.uppercase()) }

@@ -55,7 +55,9 @@ fun HubDetailScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         painter = painterResource(id = R.drawable.back_arrow),
-                        contentDescription = "Back"
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Text(

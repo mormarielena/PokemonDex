@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +15,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,10 +31,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.pokemondex.core.data.model.Pokemon
 import com.example.pokemondex.core.ui.components.Accordion
+import com.example.pokemondex.core.ui.components.DexCard
 import com.example.pokemondex.core.ui.components.TypeBadge
 import com.example.pokemondex.core.ui.components.getTypeColor
 import com.example.pokemondex.features.teammaker.viewmodel.TeamMakerViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeamMakerScreen(
     viewModel: TeamMakerViewModel = viewModel()
@@ -36,7 +44,11 @@ fun TeamMakerScreen(
     val team = viewModel.team
     val filledCount = viewModel.filledCount
     val uniqueTypes = viewModel.uniqueTypes
-
+    
+    // UI state for bottom sheet
+    var showSelectionSheet by remember { mutableStateOf(false) }
+    var selectedSlotIndex by remember { mutableStateOf(0) }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -45,7 +57,7 @@ fun TeamMakerScreen(
     ) {
         // Title
         Column(modifier = Modifier.padding(20.dp)) {
-            Text(text = "Team Maker", fontSize = 28.sp, fontWeight = FontWeight.Black, color = Color.Black)
+            Text(text = "Team Simulator", fontSize = 28.sp, fontWeight = FontWeight.Black, color = Color.Black)
             Text(
                 text = "$filledCount/6 Pokémon selected", 
                 fontSize = 14.sp, 
@@ -75,7 +87,10 @@ fun TeamMakerScreen(
                                 )
                             } else {
                                 EmptySlot(
-                                    onAdd = { viewModel.addPokemon(actualIndex) }
+                                    onAdd = { 
+                                        selectedSlotIndex = actualIndex
+                                        showSelectionSheet = true 
+                                    }
                                 )
                             }
                         }
@@ -87,7 +102,7 @@ fun TeamMakerScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // synergy accordion container
-        Accordion(title = "SYNERGY") {
+        Accordion(title = "TEAM SYNERGY") {
             if (uniqueTypes.isEmpty()) {
                 Text("Add Pokémon to see type synergy", color = Color.Gray, fontSize = 14.sp)
             } else {
@@ -105,16 +120,55 @@ fun TeamMakerScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Team stats accordion
-        Accordion(title = "TEAM STATS", initialOpen = false) {
+        // Team stats accordion - NOW SHOWING AVERAGES
+        Accordion(title = "AVERAGE STATS", initialOpen = false) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatRow(label = "Total HP", value = viewModel.teamHp.toString(), color = Color(0xFF4CAF50))
-                StatRow(label = "Total Attack", value = viewModel.teamAttack.toString(), color = Color(0xFFF44336))
-                StatRow(label = "Total Defense", value = viewModel.teamDefense.toString(), color = Color(0xFF2196F3))
+                if (filledCount == 0) {
+                    Text("Add Pokémon to see average team stats", color = Color.Gray, fontSize = 14.sp)
+                } else {
+                    StatRow(label = "Mean HP", value = viewModel.teamHp.toString(), color = Color(0xFF4CAF50))
+                    StatRow(label = "Mean Attack", value = viewModel.teamAttack.toString(), color = Color(0xFFF44336))
+                    StatRow(label = "Mean Defense", value = viewModel.teamDefense.toString(), color = Color(0xFF2196F3))
+                }
             }
         }
         
         Spacer(modifier = Modifier.height(24.dp))
+    }
+    
+    // selection sheet
+    if (showSelectionSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSelectionSheet = false },
+            containerColor = Color.White
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Choose a Pokémon",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(viewModel.availablePokemon) { pkm ->
+                        DexCard(
+                            title = pkm.name,
+                            subtitle = "Lv 50",
+                            imageUrl = pkm.imageUrl,
+                            accentColor = getTypeColor(pkm.types.first()),
+                            showAccentBar = true,
+                            onClick = {
+                                viewModel.addPokemonToSlot(selectedSlotIndex, pkm)
+                                showSelectionSheet = false
+                            }
+                        ) {
+                            pkm.types.forEach { type -> TypeBadge(type) }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
