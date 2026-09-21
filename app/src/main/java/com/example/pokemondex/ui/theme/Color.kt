@@ -2,10 +2,12 @@ package com.example.pokemondex.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val PaleTeal = Color(0xFF84DCB2)
+val PaleYellow = Color(0xFFF6E8A6)
+val WarmBeige = Color(0xFFF9C88D)
+val SoftCherry = Color(0xFFDC795F)
+val WarmOrange = Color(0xFFFD8F52)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val TextDark = Color(0xFF2D251E)
+val TextLight = Color(0xFFFAF7F2)
+val SurfaceWarm = Color(0xFFFFFDF5)

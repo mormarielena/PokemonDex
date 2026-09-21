@@ -37,7 +37,7 @@ fun PokedexListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Title
         Text(

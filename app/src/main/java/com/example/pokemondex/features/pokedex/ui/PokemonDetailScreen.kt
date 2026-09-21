@@ -21,9 +21,6 @@ import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.example.pokemondex.R
 import com.example.pokemondex.core.data.model.Pokemon
-import com.example.pokemondex.core.ui.components.RadarChart
-import com.example.pokemondex.core.ui.components.StatBar
-import com.example.pokemondex.core.ui.components.TypeBadge
 import com.example.pokemondex.core.ui.components.getTypeColor
 
 @Composable
@@ -246,10 +243,15 @@ fun PokemonInfoTab(pokemon: Pokemon) {
 
 @Composable
 fun PokemonStatsTab(pokemon: Pokemon) {
-    val stats = listOf(pokemon.hp, pokemon.atk, pokemon.def, pokemon.spatk, pokemon.spdef, pokemon.spd)
-    val labels = listOf("HP", "ATK", "DEF", "SpA", "SpD", "SPE")
-    val totalStats = stats.sum()
-    val primaryColor = getTypeColor(pokemon.types.firstOrNull() ?: "")
+    val stats = listOf(
+        "HP" to pokemon.hp,
+        "ATK" to pokemon.atk,
+        "DEF" to pokemon.def,
+        "SpA" to pokemon.spatk,
+        "SpD" to pokemon.spdef,
+        "SPE" to pokemon.spd
+    )
+    val totalStats = stats.sumOf { it.second }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Card(
@@ -269,19 +271,40 @@ fun PokemonStatsTab(pokemon: Pokemon) {
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                labels.forEachIndexed { i, label ->
-                    StatBar(label = label, value = stats[i])
-                }
-            }
-        }
+                stats.forEach { (label, value) ->
+                    // Determine the rating and color based on the stat value using a 'when' statement
+                    val (ratingText, ratingColor) = when {
+                        value < 50 -> "Weak" to Color(0xFFE57373) // Red
+                        value in 50..89 -> "Average" to Color(0xFFFFB74D) // Orange
+                        value in 90..119 -> "Good" to Color(0xFF81C784) // Light Green
+                        else -> "Strong" to Color(0xFF388E3C) // Dark Green
+                    }
 
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(modifier = Modifier.padding(20.dp)) {
-                RadarChart(stats = stats, labels = labels, color = primaryColor)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = label, 
+                            modifier = Modifier.weight(0.2f), 
+                            fontWeight = FontWeight.Bold, 
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = value.toString(), 
+                            modifier = Modifier.weight(0.2f), 
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = ratingText, 
+                            modifier = Modifier.weight(0.6f), 
+                            color = ratingColor, 
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }
