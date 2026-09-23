@@ -45,7 +45,7 @@ fun HubDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // toolbar
         Surface(
