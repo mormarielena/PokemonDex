@@ -53,6 +53,27 @@ interface PokeApiService {
     suspend fun getLocationList(
         @Query("limit") limit: Int = 20
     ): PokemonListResponse
+    
+    @GET("item-category/{name}")
+    suspend fun getItemCategory(
+        @Path("name") name: String
+    ): com.example.pokemondex.core.data.network.model.ItemCategoryResponse
+
+    // hub detail endpoints
+    @GET("item/{name}")
+    suspend fun getItemDetail(
+        @Path("name") name: String
+    ): com.example.pokemondex.core.data.network.model.ItemDetailDto
+
+    @GET("berry/{name}")
+    suspend fun getBerryDetail(
+        @Path("name") name: String
+    ): com.example.pokemondex.core.data.network.model.BerryDetailDto
+
+    @GET("location/{name}")
+    suspend fun getLocationDetail(
+        @Path("name") name: String
+    ): com.example.pokemondex.core.data.network.model.LocationDetailDto
 
     //retrofit companion object
     companion object {

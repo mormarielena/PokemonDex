@@ -1,5 +1,6 @@
 package com.example.pokemondex.features.teammaker.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,12 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.pokemondex.R
 import com.example.pokemondex.core.data.model.Pokemon
 import com.example.pokemondex.core.ui.components.Accordion
 import com.example.pokemondex.core.ui.components.DexCard
@@ -56,13 +59,20 @@ fun TeamMakerScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // Title
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(text = "Team Simulator", fontSize = 28.sp, fontWeight = FontWeight.Black, color = Color.Black)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Image(
+                painter = painterResource(id = R.drawable.teammaker_title),
+                contentDescription = "TeamMaker",
+                modifier = Modifier
+                    .padding(horizontal = 0.dp, vertical = 8.dp)
+                    .height(38.dp)
+            )
             Text(
                 text = "$filledCount/6 Pokémon selected", 
                 fontSize = 14.sp, 
                 color = Color.Gray, 
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 4.dp)
             )
         }
 

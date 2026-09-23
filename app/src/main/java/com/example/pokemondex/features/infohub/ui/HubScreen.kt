@@ -1,5 +1,6 @@
 package com.example.pokemondex.features.infohub.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pokemondex.R
 import com.example.pokemondex.features.infohub.viewmodel.HubViewModel
 
 data class Category(
@@ -55,8 +58,19 @@ fun HubScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Info Hub", fontSize = 28.sp, fontWeight = FontWeight.Black)
-                Text(text = "Explore the Pokemon World!", fontSize = 14.sp, color = Color.Gray)
+                Image(
+                    painter = painterResource(id = R.drawable.infohub_title),
+                    contentDescription = "InfoHub",
+                    modifier = Modifier
+                        .padding(horizontal = 0.dp, vertical = 8.dp)
+                        .height(38.dp)
+                )
+                Text(
+                    text = "Explore the Pokemon World!", 
+                    fontSize = 14.sp, 
+                    color = Color.Gray,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
             }
         }
 

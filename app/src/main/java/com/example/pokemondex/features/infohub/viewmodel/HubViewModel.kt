@@ -31,6 +31,9 @@ class HubViewModel(application: Application) : AndroidViewModel(application) {
         
     var isLoading by mutableStateOf(false)
         private set
+        
+    var selectedItemDetails by mutableStateOf<String?>(null)
+        private set
 
     init {
         fetchStats()
@@ -54,13 +57,20 @@ class HubViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun loadCategory(key: String) {
+    fun loadCategory(key: String, subCategory: String? = null) {
         viewModelScope.launch {
             isLoading = true
             try {
+                // If it's the "items" category and a subCategory is provided, we fetch from the item-category endpoint.
                 val results = when(key) {
                     "berries" -> PokeApiService.instance.getBerryList(limit = 20).results
-                    "items" -> PokeApiService.instance.getItemList(limit = 20).results
+                    "items" -> {
+                        when (subCategory) {
+                            "Poké Balls" -> PokeApiService.instance.getItemCategory("standard-balls").items
+                            "Consumables" -> PokeApiService.instance.getItemCategory("healing").items
+                            else -> PokeApiService.instance.getItemList(limit = 20).results // fallback
+                        }
+                    }
                     "places" -> PokeApiService.instance.getLocationList(limit = 20).results
                     else -> emptyList()
                 }
@@ -70,7 +80,7 @@ class HubViewModel(application: Application) : AndroidViewModel(application) {
                     val id = urlParts.last()
                     
                     val imgUrl = when(key) {
-                        "berries" -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/berry-${resource.name}.png"
+                        "berries" -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${resource.name}-berry.png"
                         "items" -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${resource.name}.png"
                         else -> "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png"
                     }
@@ -87,5 +97,44 @@ class HubViewModel(application: Application) : AndroidViewModel(application) {
                 isLoading = false
             }
         }
+    }
+
+    fun fetchItemDetails(categoryKey: String, rawName: String) {
+        viewModelScope.launch {
+            try {
+                // Determine actual api name format (lowercase, replace spaces with hyphens)
+                val apiName = rawName.lowercase().replace(" ", "-")
+
+                val detailString = when (categoryKey) {
+                    "items" -> {
+                        val item = PokeApiService.instance.getItemDetail(apiName)
+                        val effect = item.effectEntries.find { it.language.name == "en" }?.shortEffect
+                            ?: "No effect description available."
+                        "Effect: ${effect.replace("\n", " ")}"
+                    }
+                    "berries" -> {
+                        // berry api requires the berry name without the word "berry"
+                        val realName = apiName.replace("-berry", "")
+                        val berry = PokeApiService.instance.getBerryDetail(realName)
+                        "Size: ${berry.size} mm\nFirmness: ${berry.firmness.name.replace("-", " ").replaceFirstChar { it.uppercase() }}"
+                    }
+                    "places" -> {
+                        val location = PokeApiService.instance.getLocationDetail(apiName)
+                        val regionName = location.region?.name?.replaceFirstChar { it.uppercase() } ?: "Unknown Region"
+                        "Region: $regionName"
+                    }
+                    else -> "No details available."
+                }
+                
+                selectedItemDetails = detailString
+            } catch (e: Exception) {
+                e.printStackTrace()
+                selectedItemDetails = "Could not fetch details."
+            }
+        }
+    }
+
+    fun clearSelectedItemDetails() {
+        selectedItemDetails = null
     }
 }

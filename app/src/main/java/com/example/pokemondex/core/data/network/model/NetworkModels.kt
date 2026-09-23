@@ -5,13 +5,7 @@ import com.google.gson.annotations.SerializedName
 //list responde
 data class PokemonListResponse(
     val count: Int,
-    val results: List<PokemonEntryDto>
-)
-
-//element from list
-data class PokemonEntryDto(
-    val name: String,
-    val url: String
+    val results: List<NamedResourceDto>
 )
 
 //pokemon detalis
@@ -139,4 +133,36 @@ data class NamedResourceDetailDto(
 data class ItemSpritesDto(
     @SerializedName("default")
     val default: String
+)
+
+data class ItemCategoryResponse(
+    val items: List<NamedResourceDto>
+)
+
+// InfoHub detailed models
+data class ItemDetailDto(
+    val id: Int,
+    val name: String,
+    @SerializedName("effect_entries")
+    val effectEntries: List<EffectEntryDto>
+)
+
+data class EffectEntryDto(
+    val effect: String,
+    @SerializedName("short_effect")
+    val shortEffect: String,
+    val language: LanguageDto
+)
+
+data class BerryDetailDto(
+    val id: Int,
+    val name: String,
+    val size: Int,
+    val firmness: NamedResourceDto
+)
+
+data class LocationDetailDto(
+    val id: Int,
+    val name: String,
+    val region: NamedResourceDto?
 )
